@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP Button Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .calculator {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 260px;
+        }
+
+        .calculator h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .display {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .buttons input {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .buttons input:hover {
+            background-color: #d0d0d0;
+        }
+
+        .buttons .operator {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .buttons .operator:hover {
+            background-color: #0056b3;
+        }
+
+        .buttons .equal {
+            background-color: #28a745;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .buttons .equal:hover {
+            background-color: #218838;
+        }
+
+        .buttons .clear {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .buttons .clear:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <h2>Calculator B.S.</h2>
+
+    <?php
+    $expression = isset($_POST['expression']) ? $_POST['expression'] : '';
+    $input = isset($_POST['input']) ? $_POST['input'] : '';
+
+    if ($input === 'C') {
+        $expression = '';
+    } elseif ($input === '=') {
+        // Evaluate the expression
+        try {
+            // Basic security: only allow numbers and operators
+            if (preg_match('/^[0-9+\-*/.]+$/', $expression)) {
+                eval("\$expression = $expression;");
+            } else {
+                $expression = "Error";
+            }
+        } catch (Exception $e) {
+            $expression = "Error";
+        }
+    } else {
+        $expression .= $input;
+    }
+    ?>
+
+    <form method="post">
+        <input type="text" class="display" name="expression" value="<?php echo $expression; ?>" readonly>
+
+        <div class="buttons">
+            <?php
+            $buttons = [
+                '7', '8', '9', '/',
+                '4', '5', '6', '*',
+                '1', '2', '3', '-',
+                '0', '.', 'C', '+',
+                '=', ''
+            ];
+
+            foreach ($buttons as $btn) {
+                if ($btn === '') {
+                    echo '<div></div>';
+                    continue;
+                }
+                $class = '';
+                if (in_array($btn, ['+', '-', '*', '/'])) $class = 'operator';
+                elseif ($btn === '=') $class = 'equal';
+                elseif ($btn === 'C') $class = 'clear';
+
+                echo "<button type='submit' name='input' value='$btn' class='$class'>$btn</button>";
+            }
+            ?>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
